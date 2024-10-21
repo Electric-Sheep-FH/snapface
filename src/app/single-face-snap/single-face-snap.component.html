@@ -1,4 +1,4 @@
-<div class="face-snap-card" [ngClass]="{ snapped: userHasLiked }">
+<div class="face-snap-card" *ngIf="faceSnap$ | async as faceSnap" [ngClass]="{ snapped: userHasLiked }">
   <h2 style="margin-bottom: 20px;">{{ faceSnap.title | uppercase }}</h2>
   <a routerLink="/facesnaps">Retour</a>
   <br>
@@ -11,6 +11,6 @@
   <p style="font-weight: 500;">{{ faceSnap.description }}</p>
   <p style="font-size: 14px; font-style: italic;">FaceSnap créée le {{ faceSnap.createdAt | date: 'dd MMMM yyyy, à HH:mm' }}</p>
   <p>
-    <button (click)="onLike()">{{likeButtonString}}</button>
+    <button (click)="onLike(faceSnap.id)">{{likeButtonString}}</button>
     <span [ngStyle]="{ color: 'rgb(0,' + faceSnap.snaps + ', 0'}">👍 {{ faceSnap.snaps }}</span></p>
 </div>

@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { FaceSnap } from '../models/face-snap';
-import { CurrencyPipe, DatePipe, LowerCasePipe, NgClass, NgStyle, TitleCasePipe, UpperCasePipe } from '@angular/common';
+import { AsyncPipe, CurrencyPipe, DatePipe, LowerCasePipe, NgClass, NgIf, NgStyle, TitleCasePipe, UpperCasePipe } from '@angular/common';
 import { FaceSnapsService } from '../services/face-snaps.service';
 import { ActivatedRoute, RouterLink } from '@angular/router';
+import { Observable, tap } from 'rxjs';
 
 @Component({
   selector: 'app-single-face-snap',
@@ -15,13 +16,15 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
     TitleCasePipe,
     DatePipe,
     CurrencyPipe,
-    RouterLink
+    RouterLink,
+    NgIf,
+    AsyncPipe
   ],
   templateUrl: './single-face-snap.component.html',
   styleUrl: './single-face-snap.component.scss'
 })
 export class SingleFaceSnapComponent implements OnInit {
-  faceSnap!: FaceSnap;
+  faceSnap$!: Observable<FaceSnap>;
 
   likeButtonString!: string;
   userHasLiked!: boolean;
@@ -38,27 +41,33 @@ export class SingleFaceSnapComponent implements OnInit {
   }
 
 
-  onLike(): void {
+  onLike(faceSnapId: number): void {
     if (this.userHasLiked) {
-      this.unliked();
+      this.unliked(faceSnapId);
     } else {
-      this.liked();
+      this.liked(faceSnapId);
     }
   }
 
-  liked(): void {
-    this.faceSnapsService.snapFaceSnapById(this.faceSnap.id, 'like');
-    this.likeButtonString = "Unlike";
-    this.userHasLiked = true;
+  liked(faceSnapId: number): void {
+    this.faceSnap$ = this.faceSnapsService.snapFaceSnapById(faceSnapId, 'like').pipe(
+      tap(() => {
+        this.likeButtonString = "Unlike";
+        this.userHasLiked = true;
+      })
+    );
   }
-  unliked(): void {
-    this.faceSnapsService.snapFaceSnapById(this.faceSnap.id, 'unlike');
-    this.likeButtonString = "Like";
-    this.userHasLiked = false;
+  unliked(faceSnapId: number): void {
+    this.faceSnap$ = this.faceSnapsService.snapFaceSnapById(faceSnapId, 'unlike').pipe(
+      tap(() => {
+        this.likeButtonString = "like";
+        this.userHasLiked = false;
+      })
+    );
   }
   private getFaceSnap() {
     const faceSnapId = this.route.snapshot.params['id'];
-    this.faceSnap = this.faceSnapsService.getFaceSnapById(faceSnapId);
+    this.faceSnap$ = this.faceSnapsService.getFaceSnapById(faceSnapId);
   }
   private prepareInterface() {
     this.likeButtonString = "Like";
