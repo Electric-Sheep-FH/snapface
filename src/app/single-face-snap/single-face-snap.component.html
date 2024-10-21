@@ -1,0 +1,16 @@
+<div class="face-snap-card" [ngClass]="{ snapped: userHasLiked }">
+  <h2 style="margin-bottom: 20px;">{{ faceSnap.title | uppercase }}</h2>
+  <a routerLink="/facesnaps">Retour</a>
+  <br>
+  <img [src]="faceSnap.imageUrl" [alt]="faceSnap.title">
+  @if (faceSnap.location) {
+    <p style="font-size: 14px;">Localisation : {{ faceSnap.location }}</p>
+  } @else {
+    <p style="font-size: 14px;">Localisation non spécifiée</p>
+  }
+  <p style="font-weight: 500;">{{ faceSnap.description }}</p>
+  <p style="font-size: 14px; font-style: italic;">FaceSnap créée le {{ faceSnap.createdAt | date: 'dd MMMM yyyy, à HH:mm' }}</p>
+  <p>
+    <button (click)="onLike()">{{likeButtonString}}</button>
+    <span [ngStyle]="{ color: 'rgb(0,' + faceSnap.snaps + ', 0'}">👍 {{ faceSnap.snaps }}</span></p>
+</div>
